@@ -1,10 +1,7 @@
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
 import { useEffect, useState } from 'react';
-import { csv } from 'csv-parser';
-import { LatLngExpression } from 'leaflet';
+import type { LatLngExpression } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-
-
 
 interface Stop {
     id: string;
@@ -43,12 +40,13 @@ export default function MapView() {
         <MapContainer
             center={nycCenter} // Default to New York City
             zoom={12}
-            style={{ height: '100vh', width: '100%' }}
+            style={{ height: '100vh', width: '100vw' }}
         >
-            <TileLayer 
-                url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             />
+
             {stops.map((stop) => (
                 <Marker key={stop.id} position={[stop.lat, stop.lon]}>
                     <Popup>{stop.name}</Popup>

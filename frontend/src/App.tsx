@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import MapView from './MapView';
 
 function App() {
   const [routes, setRoutes] = useState<any[]>([]);
@@ -33,6 +34,10 @@ function App() {
               {route.shortName || route.id}
           </div>
         ))}
+      </div>
+
+      <div style={{ marginTop: '20px', height: '80vh', width: '100%'}}>
+        <MapView />
       </div>
     </div>
   );
