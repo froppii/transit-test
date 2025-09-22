@@ -1,35 +1,43 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [routes, setRoutes] = useState<{ id: number; name: string; status: string }[]>([]);
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetch(`${apiUrl}/routes`)
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        return res.json();
+      })
+      .then(data => {
+        setRoutes(data);
+        setError('');
+      })
+      .catch(err => setError('fetch error:' + err.message)); 
+  } , [apiUrl]);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="App">
+      <h1>Transit</h1>
+      <p><strong>API URL:</strong> {apiUrl}</p>
 
-export default App
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+
+      {routes.length > 0 ? (
+        <ul>
+          {routes.map(route => (
+            <li key={route.id}>
+              <strong>{route.name}</strong> - {route.status}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        !error && <p>Loading routes...</p>
+      )}
+    </div>
+  );
+};
+
+export default App;
