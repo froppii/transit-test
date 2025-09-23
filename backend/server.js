@@ -88,9 +88,9 @@ app.get("/api/stops", (req, res) => {
 
 app.get("/api/shapes", (req, res) => {
   const shapes = {};
-  const filePath = path.join(DATA_DIR, "shapes.txt");
+  const shapesFile = path.join(DATA_DIR, "shapes.txt");
 
-  fs.createReadStream(filePath)
+  fs.createReadStream(shapesFile)
     .pipe(csv())
     .on("data", (row) => {
       const shapeId = row.shape_id;

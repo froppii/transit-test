@@ -25,12 +25,12 @@ export default function MapView() {
 
 
     useEffect(() => {
-        fetch(`${apiUrl}/stops`)
+        fetch(`${apiUrl}/api/stops`)
             .then((res) => res.json())
             .then(setStops)
             .catch(console.error);
 
-        fetch(`${apiUrl}/shapes`)
+        fetch(`${apiUrl}/api/shapes`)
             .then((res) => res.json())
             .then(setShapes)
             .catch(console.error);
