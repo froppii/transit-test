@@ -7,7 +7,7 @@ import unzipper from "unzipper";
 import csv from "csv-parser";
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 44173;
 
 app.use(cors());
 
