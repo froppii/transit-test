@@ -6,7 +6,7 @@ function App() {
   const apiUrl = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    fetch(`${apiUrl}/routes`)
+    fetch(`${apiUrl}/api/routes`)
       .then(res => res.json())
       .then(data => setRoutes(data))
       .catch(err => console.error('fetch error', err)); 
