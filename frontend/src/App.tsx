@@ -1,3 +1,4 @@
+// ...existing code...
 import { useState, useEffect } from 'react';
 import MapView from './MapView';
 
@@ -42,6 +43,10 @@ function App() {
             </div>
           );
         })}
+      </div>
+
+      <div style={{ marginTop: '20px' }}>
+        <MapView />
       </div>
     </div>
   );
