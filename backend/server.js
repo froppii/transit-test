@@ -11,6 +11,16 @@ const PORT = process.env.PORT || 38573;
 
 app.use(cors());
 
+// serve built frontend (if present)
+const staticPath = path.join(process.cwd(), 'frontend', 'dist');
+if (fs.existsSync(staticPath)) {
+  app.use(express.static(staticPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.join(staticPath, 'index.html'));
+  });
+}
+
 const GTFS_URL = "https://rrgtfsfeeds.s3.amazonaws.com/gtfs_subway.zip";
 const DATA_DIR = path.join(process.cwd(), "data", "gtfs_subway");
 
@@ -45,27 +55,59 @@ async function extractGTFS() {
   console.log("Extracted to:", DATA_DIR);
 }
 
+// helper to read a CSV file into an array of rows
+function readCsvFile(filePath) {
+  return new Promise((resolve, reject) => {
+    const rows = [];
+    fs.createReadStream(filePath)
+      .pipe(csv())
+      .on('data', (row) => rows.push(row))
+      .on('end', () => resolve(rows))
+      .on('error', (err) => reject(err));
+  });
+}
+
 app.get("/api", (req, res) => {
   res.json({ message: "API is running" });
 });
 
-app.get("/api/routes", (req, res) => {
-  const routes = [];
-  const filePath = path.join(DATA_DIR, "routes.txt");
+app.get("/api/routes", async (req, res) => {
+  try {
+    const routesFile = path.join(DATA_DIR, "routes.txt");
+    const tripsFile = path.join(DATA_DIR, "trips.txt");
 
-  fs.createReadStream(filePath)
-    .pipe(csv())
-    .on("data", (row) => {
-      routes.push({
+    // read trips and map route_id -> set(shape_id)
+    let routeShapes = {};
+    if (fs.existsSync(tripsFile)) {
+      const trips = await readCsvFile(tripsFile);
+      trips.forEach((t) => {
+        const routeId = t.route_id;
+        const shapeId = t.shape_id;
+        if (!routeId || !shapeId) return;
+        if (!routeShapes[routeId]) routeShapes[routeId] = new Set();
+        routeShapes[routeId].add(shapeId);
+      });
+    }
+
+    // read routes and attach shape list (if any)
+    const routes = [];
+    const rows = await readCsvFile(routesFile);
+    rows.forEach((row) => {
+      const r = {
         id: row.route_id,
         shortName: row.route_short_name,
         longName: row.route_long_name,
         type: row.route_type,
         color: row.route_color,
-      });
-    })
-    .on("end", () => res.json(routes))
-    .on("error", (err) => res.status(500).json({ error: err.message }));
+        shapes: Array.from(routeShapes[row.route_id] || []),
+      };
+      routes.push(r);
+    });
+
+    res.json(routes);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.get("/api/stops", (req, res) => {

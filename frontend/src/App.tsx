@@ -1,4 +1,3 @@
-// ...existing code...
 import { useState, useEffect } from 'react';
 import MapView from './MapView';
 
@@ -18,9 +17,11 @@ function App() {
   }, [apiUrl]);
 
   return (
-    <div className="App" style={{ fontFamily: 'monospace', padding: '20px'}}>
-      <h1>Transit</h1>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+    // make App a column flex container and take full viewport height
+    <div className="App" style={{ fontFamily: 'monospace', padding: '20px', height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <h1 style={{ margin: 0 }}>Transit</h1>
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', marginTop: '12px' }}>
         {routes.map(route => {
           const color = (route.color || '333333').replace(/^#/, '').padStart(6,'3');
           return (
@@ -45,7 +46,8 @@ function App() {
         })}
       </div>
 
-      <div style={{ marginTop: '20px' }}>
+      {/* map wrapper fills remaining space */}
+      <div style={{ flex: 1, marginTop: '20px', minHeight: 0 }}>
         <MapView />
       </div>
     </div>
